@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>4項目メモ</title>
+
+<style>
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+  background:#ffffff;
+  color:#000000;
+}
+h1{
+  font-size:18px;
+  margin:12px;
+}
+section{
+  margin:12px;
+}
+label{
+  display:block;
+  margin-top:10px;
+  font-size:14px;
+}
+input,textarea,button{
+  width:100%;
+  font-size:16px;
+  padding:8px;
+  margin-top:4px;
+}
+textarea{
+  height:70px;
+}
+button{
+  margin-top:10px;
+}
+hr{
+  margin:20px 0;
+}
+.item{
+  border:1px solid #ccc;
+  padding:8px;
+  margin-bottom:8px;
+}
+.date{
+  font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<h1>4項目メモ</h1>
+
+<section>
+<label>日付</label>
+<input type="date" id="date">
+
+<label>メモ</label>
+<input type="text" id="memo">
+
+<label>自分の意見</label>
+<textarea id="opinion"></textarea>
+
+<label>1日の感想</label>
+<textarea id="impression"></textarea>
+
+<button type="button" onclick="save()">保存</button>
+<button type="button" onclick="clearForm()">クリア</button>
+</section>
+
+<hr>
+
+<section id="list"></section>
+
+<script>
+const KEY = "memo4_ios";
+
+function today(){
+  const d=new Date();
+  return d.toISOString().slice(0,10);
+}
+
+document.getElementById("date").value=today();
+
+function load(){
+  return JSON.parse(localStorage.getItem(KEY)||"[]");
+}
+
+function saveData(data){
+  localStorage.setItem(KEY,JSON.stringify(data));
+}
+
+function save(){
+  const item={
+    date:date.value||today(),
+    memo:memo.value,
+    opinion:opinion.value,
+    impression:impression.value,
+    time:Date.now()
+  };
+
+  if(!item.memo && !item.opinion && !item.impression){
+    alert("何か入力してください");
+    return;
+  }
+
+  const data=load();
+  data.unshift(item);
+  saveData(data);
+
+  alert("保存しました");
+  clearForm();
+  render();
+}
+
+function clearForm(){
+  memo.value="";
+  opinion.value="";
+  impression.value="";
+}
+
+function render(){
+  const data=load();
+  const area=document.getElementById("list");
+  area.innerHTML="";
+
+  data.forEach(d=>{
+    const div=document.createElement("div");
+    div.className="item";
+    div.innerHTML=
+      `<div class="date">${d.date}</div>
+       <div>メモ：${d.memo}</div>
+       <div>意見：${d.opinion}</div>
+       <div>感想：${d.impression}</div>`;
+    area.appendChild(div);
+  });
+}
+
+render();
+</script>
+
+</body>
+</html>
