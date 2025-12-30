@@ -7,10 +7,14 @@
   <style>
     body { font-family: sans-serif; margin: 16px; }
     textarea { width: 100%; height: 55vh; font-size: 16px; padding: 12px; box-sizing: border-box; }
-    .row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-    button { padding: 10px 14px; font-size: 16px; }
+    .row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; align-items: center; }
+    button, label.btn {
+      padding: 10px 14px; font-size: 16px; cursor: pointer;
+      border: 1px solid #ccc; background: #f7f7f7; border-radius: 6px;
+    }
+    label.btn input { display: none; }
     .status { margin-top: 10px; color: #444; }
-    .small { font-size: 12px; color: #666; }
+    .small { font-size: 12px; color: #666; margin-top: 6px; }
   </style>
 </head>
 <body>
@@ -21,10 +25,17 @@
   <div class="row">
     <button id="saveBtn">SAVE</button>
     <button id="clearBtn">CLEAR</button>
+
+    <button id="exportBtn">JSON書き出し</button>
+
+    <label class="btn">
+      JSON読み込み
+      <input id="importFile" type="file" accept="application/json" />
+    </label>
   </div>
 
   <div class="status" id="status"></div>
-  <div class="small">保存先: localStorage（この端末・このブラウザに保存されます）</div>
+  <div class="small">保存先: localStorage（この端末・このブラウザに保存）＋ JSONでバックアップ可能</div>
 
   <script>
     const KEY = "memo-app:v1:text";
@@ -32,6 +43,8 @@
     const statusEl = document.getElementById("status");
     const saveBtn = document.getElementById("saveBtn");
     const clearBtn = document.getElementById("clearBtn");
+    const exportBtn = document.getElementById("exportBtn");
+    const importFile = document.getElementById("importFile");
 
     function setStatus(msg) {
       statusEl.textContent = msg;
@@ -59,23 +72,94 @@
       setStatus("削除しました。");
     }
 
+    function pad2(n) { return String(n).padStart(2, "0"); }
+    function buildTimestamp(d) {
+      return d.getFullYear()
+        + pad2(d.getMonth()+1)
+        + pad2(d.getDate())
+        + "-"
+        + pad2(d.getHours())
+        + pad2(d.getMinutes())
+        + pad2(d.getSeconds());
+    }
+
+    function exportJson() {
+      // 将来拡張できるように "text" だけでなくメタ情報も入れる
+      const data = {
+        app: "memo-app",
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        text: memoEl.value
+      };
+
+      const json = JSON.stringify(data, null, 2);
+      const blob = new Blob([json], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `memo-backup-${buildTimestamp(new Date())}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      URL.revokeObjectURL(url);
+      setStatus("JSONを書き出しました。");
+    }
+
+    async function importJsonFile(file) {
+      try {
+        const text = await file.text();
+        const obj = JSON.parse(text);
+
+        // 互換性: 旧形式（文字列だけ）も許可
+        const importedText =
+          (obj && typeof obj === "object" && "text" in obj) ? String(obj.text) :
+          (typeof obj === "string") ? obj :
+          null;
+
+        if (importedText === null) {
+          alert("このJSONは読み込めません（形式が違います）。");
+          return;
+        }
+
+        if (!confirm("このJSONでメモを置き換えます。よろしいですか？")) return;
+
+        memoEl.value = importedText;
+        localStorage.setItem(KEY, importedText);
+        setStatus("JSONから復元しました（" + new Date().toLocaleString() + "）");
+
+      } catch (e) {
+        console.error(e);
+        alert("JSONの読み込みに失敗しました。ファイルが壊れているか形式が違います。");
+      } finally {
+        // 同じファイルを連続で読み込めるようにリセット
+        importFile.value = "";
+      }
+    }
+
     // 初期読み込み
     loadMemo();
 
     // ボタン
     saveBtn.addEventListener("click", saveMemo);
     clearBtn.addEventListener("click", clearMemo);
+    exportBtn.addEventListener("click", exportJson);
 
-    // おまけ：入力したら自動で「未保存」表示
-    let dirty = false;
-    memoEl.addEventListener("input", () => {
-      if (!dirty) {
-        dirty = true;
-        setStatus("未保存です。");
+    // ファイル選択
+    importFile.addEventListener("change", () => {
+      if (importFile.files && importFile.files[0]) {
+        importJsonFile(importFile.files[0]);
       }
     });
 
-    // おまけ：ページ離脱時に未保存警告（任意）
+    // 入力したら「未保存」表示
+    memoEl.addEventListener("input", () => {
+      const saved = localStorage.getItem(KEY) ?? "";
+      if (memoEl.value !== saved) setStatus("未保存です。");
+    });
+
+    // 未保存警告（任意）
     window.addEventListener("beforeunload", (e) => {
       const saved = localStorage.getItem(KEY) ?? "";
       if (memoEl.value !== saved) {
@@ -86,4 +170,3 @@
   </script>
 </body>
 </html>
-
