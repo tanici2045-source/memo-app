@@ -1,1 +1,116 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>My Log v0.1</title>
+
+  <style>
+    /* v0.1：とりあえず見やすい最低限（後で css/app.css に分離します） */
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif; margin:0; }
+    header { display:flex; align-items:center; gap:8px; padding:10px 12px; position:sticky; top:0; background:#fff; border-bottom:1px solid #ddd; }
+    .tabs { flex:1; display:flex; gap:6px; justify-content:center; }
+    .tab { padding:8px 10px; border:1px solid #ddd; border-radius:10px; background:#fff; }
+    .iconbtn { width:40px; height:40px; border:1px solid #ddd; border-radius:10px; background:#fff; font-size:18px; }
+    main { padding:12px; }
+    .card { border:1px solid #ddd; border-radius:14px; padding:12px; }
+    label { display:block; margin:10px 0 6px; font-size:14px; color:#333; }
+    input, textarea, select { width:100%; box-sizing:border-box; padding:10px; border:1px solid #ccc; border-radius:10px; font-size:16px; }
+    textarea { min-height:70px; }
+    footer { position:sticky; bottom:0; background:#fff; border-top:1px solid #ddd; padding:10px 12px; display:flex; gap:10px; }
+    .btn { flex:1; padding:12px; border:1px solid #ddd; border-radius:12px; background:#fff; font-size:16px; }
+    .list { padding:12px; }
+    .listhead { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; color:#555; font-size:13px; }
+    .item { border:1px solid #eee; border-radius:14px; padding:10px 12px; margin:8px 0; background:#fafafa; }
+    .ver { text-align:center; color:#888; font-size:12px; padding:10px 0 18px; }
+  </style>
+</head>
+
+<body>
+  <!-- ===== ヘッダー：☰（将来メニュー） / タブ / ⋯（操作メニュー） ===== -->
+  <header>
+    <button class="iconbtn" id="menuMain" aria-label="メニュー">☰</button>
+
+    <div class="tabs" role="tablist" aria-label="メイン切替">
+      <button class="tab" data-tab="memo" id="tabMemo">Myメモ</button>
+      <button class="tab" data-tab="drive" id="tabDrive">走行</button>
+      <button class="tab" data-tab="health" id="tabHealth">健康</button>
+    </div>
+
+    <button class="iconbtn" id="menuAction" aria-label="操作">⋯</button>
+  </header>
+
+  <!-- ===== メイン：入力エリア（タブで中身を入れ替える想定） ===== -->
+  <main>
+    <div class="card" id="mainArea">
+      <!-- 共通：日付 -->
+      <label for="date">日付</label>
+      <input type="date" id="date" />
+
+      <!-- Myメモ（初期表示） -->
+      <div id="panelMemo">
+        <label for="memo">Myメモ</label>
+        <textarea id="memo" placeholder="メモ"></textarea>
+
+        <label for="opinion">自分の意見</label>
+        <textarea id="opinion" placeholder="意見"></textarea>
+
+        <label for="impression">1日の感想</label>
+        <textarea id="impression" placeholder="感想"></textarea>
+      </div>
+
+      <!-- 走行（当面は非表示にする想定。v0.1では配置だけ） -->
+      <div id="panelDrive" style="display:none;">
+        <label for="startOdo">スタートメーター（km）</label>
+        <input type="number" id="startOdo" placeholder="例：52340" />
+
+        <label for="firstDestination">最初の目的地</label>
+        <input type="text" id="firstDestination" placeholder="例：市役所" />
+
+        <div style="margin-top:8px; color:#777; font-size:13px;">
+          ※走行は1日1回。間違えたら削除して入れ直し（後で実装）
+        </div>
+      </div>
+
+      <!-- 健康（便）（当面は非表示にする想定。v0.1では配置だけ） -->
+      <div id="panelHealth" style="display:none;">
+        <label for="bmTime">時間</label>
+        <input type="time" id="bmTime" />
+
+        <label for="bmAmount">便（少/中/多）</label>
+        <select id="bmAmount">
+          <option value="">選択してください</option>
+          <option value="少">少</option>
+          <option value="中">中</option>
+          <option value="多">多</option>
+        </select>
+
+        <label for="steps">歩数（未定・空でOK）</label>
+        <input type="number" id="steps" placeholder="（未定）" />
+      </div>
+    </div>
+  </main>
+
+  <!-- ===== 下部：下書き / クリア（あなたの希望通り） ===== -->
+  <footer>
+    <button class="btn" id="draftBtn">下書き</button>
+    <button class="btn" id="clearBtn">クリア</button>
+  </footer>
+
+  <!-- ===== リスト：70〜100行（v0.1は枠だけ） ===== -->
+  <section class="list">
+    <div class="listhead">
+      <div>最新80件表示（予定）</div>
+      <div>My Log v0.1</div>
+    </div>
+
+    <div id="listArea">
+      <div class="item">（ここに保存済みデータが表示されます）</div>
+      <div class="item">v0.1ではまだ表示処理は入れていません</div>
+    </div>
+
+    <div class="ver">My Log v0.1</div>
+  </section>
+</body>
+</html>
 
