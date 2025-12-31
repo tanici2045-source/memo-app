@@ -7,14 +7,18 @@
   <style>
     body { font-family: sans-serif; margin: 16px; }
     textarea { width: 100%; height: 60vh; font-size: 16px; padding: 12px; box-sizing: border-box; }
-    .row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-    button { padding: 10px 14px; font-size: 16px; }
+    .row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; align-items: center; }
+    button, label.btn {
+      padding: 10px 14px; font-size: 16px; cursor: pointer;
+      border: 1px solid #ccc; background: #f7f7f7; border-radius: 6px;
+    }
+    label.btn input { display: none; }
     .status { margin-top: 10px; color: #444; }
   </style>
 </head>
 <body>
   <h2>メモ</h2>
-  <!-- 次の段階：JSONバックアップ（書き出し）追加 -->
+  <!-- 保存／削除／JSON書き出し＋読み込み（復元） -->
 
   <textarea id="memo" placeholder="ここにメモを書きます"></textarea>
 
@@ -22,6 +26,11 @@
     <button id="saveBtn">保存</button>
     <button id="clearBtn">削除</button>
     <button id="exportBtn">JSON書き出し</button>
+
+    <label class="btn">
+      JSON読み込み
+      <input id="importFile" type="file" accept="application/json" />
+    </label>
   </div>
 
   <div class="status" id="status"></div>
@@ -33,6 +42,7 @@
     const saveBtn = document.getElementById("saveBtn");
     const clearBtn = document.getElementById("clearBtn");
     const exportBtn = document.getElementById("exportBtn");
+    const importFile = document.getElementById("importFile");
     const statusEl = document.getElementById("status");
 
     // 起動時：保存済みがあれば読み込み
@@ -91,6 +101,40 @@
 
       URL.revokeObjectURL(url);
       statusEl.textContent = "JSONを書き出しました。";
+    });
+
+    // JSON読み込み（復元）
+    importFile.addEventListener("change", async () => {
+      if (!importFile.files || !importFile.files[0]) return;
+
+      try {
+        const file = importFile.files[0];
+        const text = await file.text();
+        const obj = JSON.parse(text);
+
+        const importedText =
+          (obj && typeof obj === "object" && "text" in obj) ? String(obj.text) :
+          (typeof obj === "string") ? obj :
+          null;
+
+        if (importedText === null) {
+          alert("このJSONは読み込めません（形式が違います）。");
+          return;
+        }
+
+        if (!confirm("このJSONでメモを置き換えます。よろしいですか？")) return;
+
+        memoEl.value = importedText;
+        localStorage.setItem(KEY, importedText);
+        statusEl.textContent = "JSONから復元しました。";
+
+      } catch (e) {
+        console.error(e);
+        alert("JSONの読み込みに失敗しました。ファイルが壊れているか形式が違います。");
+      } finally {
+        // 同じファイルを続けて選べるようにリセット
+        importFile.value = "";
+      }
     });
   </script>
 </body>
