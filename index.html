@@ -7,20 +7,21 @@
   <style>
     body { font-family: sans-serif; margin: 16px; }
     textarea { width: 100%; height: 60vh; font-size: 16px; padding: 12px; box-sizing: border-box; }
-    .row { display: flex; gap: 8px; margin-top: 10px; }
+    .row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
     button { padding: 10px 14px; font-size: 16px; }
     .status { margin-top: 10px; color: #444; }
   </style>
 </head>
 <body>
   <h2>メモ</h2>
-  <!-- 白紙＋保存1つ → 次の段階：削除ボタン追加 -->
+  <!-- 次の段階：JSONバックアップ（書き出し）追加 -->
 
   <textarea id="memo" placeholder="ここにメモを書きます"></textarea>
 
   <div class="row">
     <button id="saveBtn">保存</button>
     <button id="clearBtn">削除</button>
+    <button id="exportBtn">JSON書き出し</button>
   </div>
 
   <div class="status" id="status"></div>
@@ -31,6 +32,7 @@
     const memoEl = document.getElementById("memo");
     const saveBtn = document.getElementById("saveBtn");
     const clearBtn = document.getElementById("clearBtn");
+    const exportBtn = document.getElementById("exportBtn");
     const statusEl = document.getElementById("status");
 
     // 起動時：保存済みがあれば読み込み
@@ -55,8 +57,44 @@
       memoEl.value = "";
       statusEl.textContent = "削除しました。";
     });
+
+    // JSON書き出し（バックアップ）
+    function pad2(n) { return String(n).padStart(2, "0"); }
+    function buildTimestamp(d) {
+      return d.getFullYear()
+        + pad2(d.getMonth() + 1)
+        + pad2(d.getDate())
+        + "-"
+        + pad2(d.getHours())
+        + pad2(d.getMinutes())
+        + pad2(d.getSeconds());
+    }
+
+    exportBtn.addEventListener("click", () => {
+      const data = {
+        app: "memo-app",
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        text: memoEl.value
+      };
+
+      const json = JSON.stringify(data, null, 2);
+      const blob = new Blob([json], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `memo-backup-${buildTimestamp(new Date())}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      URL.revokeObjectURL(url);
+      statusEl.textContent = "JSONを書き出しました。";
+    });
   </script>
 </body>
 </html>
+
 
 
