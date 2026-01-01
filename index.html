@@ -2,143 +2,676 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>メモ</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Myメモ</title>
   <style>
-    body { font-family: sans-serif; margin: 16px; }
-    textarea { width: 100%; height: 60vh; font-size: 16px; padding: 12px; box-sizing: border-box; }
-    .row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; align-items: center; }
-    button, label.btn {
-      padding: 10px 14px; font-size: 16px; cursor: pointer;
-      border: 1px solid #ccc; background: #f7f7f7; border-radius: 6px;
+    :root{
+      --bg:#f7f7f8; --card:#fff; --text:#111; --muted:#666;
+      --line:#e6e6e6; --btn:#111; --btnText:#fff;
+      --btn2:#fff; --btn2Text:#111;
     }
-    label.btn input { display: none; }
-    .status { margin-top: 10px; color: #444; }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
+      background:var(--bg); color:var(--text);
+    }
+    .app{max-width:720px; margin:0 auto; padding:12px 12px 18px;}
+    header{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 8px; margin-bottom:10px;
+    }
+    .h-left,.h-right{display:flex; align-items:center; gap:10px;}
+    .iconBtn{
+      border:1px solid var(--line); background:var(--card); border-radius:12px;
+      padding:10px 12px; cursor:pointer; user-select:none;
+    }
+    .title{
+      font-weight:700; font-size:18px;
+    }
+    .statusPill{
+      display:flex; align-items:center; gap:8px;
+      border:1px solid var(--line); background:var(--card);
+      border-radius:999px; padding:8px 12px; font-size:12px; color:var(--muted);
+    }
+    .dot{width:10px;height:10px;border-radius:50%;}
+    .card{
+      background:var(--card); border:1px solid var(--line); border-radius:16px;
+      padding:12px; box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+    }
+    .field{display:flex; flex-direction:column; gap:6px; margin-bottom:10px;}
+    label{font-size:12px; color:var(--muted);}
+    input[type="text"]{
+      width:100%; padding:12px 12px; border:1px solid var(--line); border-radius:12px;
+      font-size:16px; outline:none;
+    }
+    textarea{
+      width:100%; min-height:190px; padding:12px 12px;
+      border:1px solid var(--line); border-radius:12px;
+      font-size:16px; line-height:1.5; resize:vertical; outline:none;
+    }
+    .row{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;
+      margin-top:8px;
+    }
+    .btnRow{display:flex; gap:10px; flex-wrap:wrap;}
+    button{
+      border:none; border-radius:12px; padding:12px 14px; cursor:pointer;
+      font-size:14px; font-weight:650;
+    }
+    .primary{background:var(--btn); color:var(--btnText);}
+    .secondary{background:var(--btn2); color:var(--btn2Text); border:1px solid var(--line);}
+    .danger{background:#fff; color:#b00020; border:1px solid #f0cbd2;}
+    .tiny{padding:8px 10px; font-size:12px; border-radius:10px; font-weight:600;}
+    .seg{
+      display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+    }
+    .seg button{background:#fff; border:1px solid var(--line); color:#111;}
+    .seg button.active{background:#111; color:#fff; border-color:#111;}
+    .subActions{
+      display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;
+    }
+    .listCard{margin-top:12px;}
+    .listHeader{
+      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+      margin-bottom:8px;
+    }
+    .listTitle{font-weight:750;}
+    .search{
+      flex:1; min-width:180px;
+      padding:10px 12px; border:1px solid var(--line); border-radius:12px;
+      outline:none;
+    }
+    .items{display:flex; flex-direction:column; gap:8px;}
+    .item{
+      border:1px solid var(--line); border-radius:14px; padding:10px 10px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px; background:#fff;
+    }
+    .itemLeft{display:flex; flex-direction:column; gap:4px; min-width:0;}
+    .itemTop{display:flex; align-items:center; gap:10px; min-width:0;}
+    .badge{
+      font-size:11px; padding:4px 8px; border-radius:999px; border:1px solid var(--line); color:var(--muted);
+      flex:0 0 auto;
+    }
+    .badge.todo{border-color:#e7d39a; color:#7a5a00; background:#fff9e6;}
+    .badge.done{border-color:#b8e2c0; color:#0d5e2a; background:#f0fff4;}
+    .itemTitle{
+      font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    }
+    .itemMeta{font-size:12px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+    .itemBtns{display:flex; gap:8px; flex:0 0 auto;}
+    .hint{font-size:12px; color:var(--muted); margin-top:6px;}
+    footer{margin-top:10px; font-size:12px; color:var(--muted); text-align:center;}
+    .hidden{display:none;}
+    input[type="file"]{display:none;}
   </style>
 </head>
 <body>
-  <h2>メモ</h2>
-  <!-- 保存／削除／JSON書き出し＋読み込み（復元） -->
+  <div class="app">
+    <header>
+      <div class="h-left">
+        <div class="iconBtn" id="menuBtn" title="メニュー（今は飾り）">☰</div>
+        <div class="title">Myメモ</div>
+      </div>
+      <div class="h-right">
+        <div class="statusPill" id="saveState">
+          <span class="dot" id="saveDot" style="background:#999"></span>
+          <span id="saveText">待機中</span>
+        </div>
+      </div>
+    </header>
 
-  <textarea id="memo" placeholder="ここにメモを書きます"></textarea>
+    <div class="card">
+      <div class="field">
+        <label>タイトル</label>
+        <input type="text" id="titleInput" placeholder="（空でもOK）" />
+      </div>
 
-  <div class="row">
-    <button id="saveBtn">保存</button>
-    <button id="clearBtn">削除</button>
-    <button id="exportBtn">JSON書き出し</button>
+      <div class="field">
+        <label>本文</label>
+        <textarea id="bodyInput" placeholder="ここにメモを入力"></textarea>
+      </div>
 
-    <label class="btn">
-      JSON読み込み
-      <input id="importFile" type="file" accept="application/json" />
-    </label>
+      <div class="row">
+        <div class="btnRow">
+          <button class="secondary" id="draftBtn">下書き</button>
+          <button class="primary" id="saveBtn">保存</button>
+          <button class="secondary" id="newBtn">新規</button>
+          <button class="secondary" id="toggleStatusBtn">未/済 切替</button>
+          <button class="danger" id="deleteBtn">削除</button>
+        </div>
+
+        <div class="subActions">
+          <button class="secondary tiny" id="exportJsonBtn">JSON書き出し</button>
+          <button class="secondary tiny" id="importJsonBtn">JSON読み込み</button>
+          <button class="secondary tiny" id="exportCsvBtn">CSV書き出し</button>
+          <input type="file" id="importFile" accept=".json,application/json" />
+        </div>
+      </div>
+
+      <div class="hint" id="currentInfo"></div>
+    </div>
+
+    <div class="card listCard">
+      <div class="listHeader">
+        <div class="listTitle">メモ一覧（未/済）</div>
+        <input class="search" id="searchInput" placeholder="検索（タイトル/本文）" />
+      </div>
+
+      <div class="row" style="margin-top:0;">
+        <div class="seg" aria-label="filter">
+          <button class="tiny active" data-filter="all">全部</button>
+          <button class="tiny" data-filter="todo">未</button>
+          <button class="tiny" data-filter="done">済</button>
+        </div>
+        <div class="hint">※ クリックで読み込み／右のボタンで操作</div>
+      </div>
+
+      <div class="items" id="items"></div>
+    </div>
+
+    <footer>localStorage 保存（GitHub Pagesで完結） / JSON・CSV でバックアップ可能</footer>
   </div>
 
-  <div class="status" id="status"></div>
+<script>
+(() => {
+  // ====== Storage Keys ======
+  const KEY_DATA  = "mymemo:data:v1";   // 本保存
+  const KEY_DRAFT = "mymemo:draft:v1";  // 下書き
+  const KEY_LAST  = "mymemo:lastId:v1"; // 最後に開いたID
 
-  <script>
-    const KEY = "memo-app:v1:text";
+  // ====== DOM ======
+  const titleInput = document.getElementById("titleInput");
+  const bodyInput  = document.getElementById("bodyInput");
+  const draftBtn   = document.getElementById("draftBtn");
+  const saveBtn    = document.getElementById("saveBtn");
+  const newBtn     = document.getElementById("newBtn");
+  const deleteBtn  = document.getElementById("deleteBtn");
+  const toggleStatusBtn = document.getElementById("toggleStatusBtn");
 
-    const memoEl = document.getElementById("memo");
-    const saveBtn = document.getElementById("saveBtn");
-    const clearBtn = document.getElementById("clearBtn");
-    const exportBtn = document.getElementById("exportBtn");
-    const importFile = document.getElementById("importFile");
-    const statusEl = document.getElementById("status");
+  const exportJsonBtn = document.getElementById("exportJsonBtn");
+  const importJsonBtn = document.getElementById("importJsonBtn");
+  const exportCsvBtn  = document.getElementById("exportCsvBtn");
+  const importFile    = document.getElementById("importFile");
 
-    // 起動時：保存済みがあれば読み込み
-    const saved = localStorage.getItem(KEY);
-    if (saved !== null) {
-      memoEl.value = saved;
-      statusEl.textContent = "保存データを読み込みました。";
-    } else {
-      statusEl.textContent = "新規メモです。";
+  const itemsEl   = document.getElementById("items");
+  const searchInput = document.getElementById("searchInput");
+
+  const saveDot   = document.getElementById("saveDot");
+  const saveText  = document.getElementById("saveText");
+  const currentInfo = document.getElementById("currentInfo");
+
+  // ====== State ======
+  let memos = [];            // array
+  let currentId = null;      // editing memo id
+  let currentStatus = "todo";// "todo" or "done"
+  let dirty = false;
+  let filterMode = "all";
+
+  // ====== Utils ======
+  const nowStr = () => {
+    const d = new Date();
+    const pad = (n) => String(n).padStart(2,"0");
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
+
+  const uid = () => {
+    // 衝突しにくいID（時間＋乱数）
+    return `m_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,8)}`;
+  };
+
+  const setSaveState = (kind, msg) => {
+    // kind: idle, dirty, saved, draft, error
+    const map = {
+      idle:  "#999",
+      dirty: "#d4a106",
+      saved: "#1f8a3b",
+      draft: "#1b6ac9",
+      error: "#b00020",
+    };
+    saveDot.style.background = map[kind] || "#999";
+    saveText.textContent = msg;
+  };
+
+  const safeParse = (text) => {
+    try { return { ok:true, data: JSON.parse(text) }; }
+    catch(e){ return { ok:false, error: e }; }
+  };
+
+  const escapeCsv = (s) => {
+    const t = (s ?? "").toString();
+    if (/[",\n\r]/.test(t)) return `"${t.replaceAll('"','""')}"`;
+    return t;
+  };
+
+  const downloadBlob = (content, filename, type) => {
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+
+  // ====== Load / Save ======
+  const loadAll = () => {
+    const raw = localStorage.getItem(KEY_DATA);
+    if (!raw) return [];
+    const p = safeParse(raw);
+    if (!p.ok) return [];
+    if (!Array.isArray(p.data)) return [];
+    // normalize
+    return p.data.map(m => ({
+      id: String(m.id || uid()),
+      title: (m.title ?? "").toString(),
+      body: (m.body ?? "").toString(),
+      status: (m.status === "done") ? "done" : "todo",
+      created: (m.created ?? nowStr()).toString(),
+      updated: (m.updated ?? nowStr()).toString(),
+    }));
+  };
+
+  const saveAll = () => {
+    localStorage.setItem(KEY_DATA, JSON.stringify(memos, null, 2));
+  };
+
+  const loadDraft = () => {
+    const raw = localStorage.getItem(KEY_DRAFT);
+    if (!raw) return null;
+    const p = safeParse(raw);
+    if (!p.ok) return null;
+    return p.data;
+  };
+
+  const saveDraft = (obj) => {
+    localStorage.setItem(KEY_DRAFT, JSON.stringify(obj, null, 2));
+  };
+
+  const setLastId = (id) => localStorage.setItem(KEY_LAST, id || "");
+  const getLastId = () => localStorage.getItem(KEY_LAST) || "";
+
+  // ====== Editor ======
+  const setDirty = (v) => {
+    dirty = v;
+    if (dirty) setSaveState("dirty", "未保存");
+    else setSaveState("idle", "待機中");
+  };
+
+  const setEditor = (memoOrNull) => {
+    if (!memoOrNull) {
+      currentId = null;
+      currentStatus = "todo";
+      titleInput.value = "";
+      bodyInput.value  = "";
+      currentInfo.textContent = "新規メモ（未）";
+      setDirty(false);
+      setLastId("");
+      return;
+    }
+    currentId = memoOrNull.id;
+    currentStatus = memoOrNull.status;
+    titleInput.value = memoOrNull.title;
+    bodyInput.value  = memoOrNull.body;
+    currentInfo.textContent = `編集中: ${memoOrNull.status === "done" ? "済" : "未"} / 更新: ${memoOrNull.updated}`;
+    setDirty(false);
+    setLastId(currentId);
+  };
+
+  const getEditorSnapshot = () => ({
+    id: currentId || null,
+    title: titleInput.value.trim(),
+    body: bodyInput.value,
+    status: currentStatus,
+    at: nowStr()
+  });
+
+  const findMemo = (id) => memos.find(m => m.id === id);
+
+  // ====== List Render ======
+  const filteredMemos = () => {
+    const q = searchInput.value.trim().toLowerCase();
+    return memos
+      .filter(m => {
+        if (filterMode === "todo" && m.status !== "todo") return false;
+        if (filterMode === "done" && m.status !== "done") return false;
+        if (!q) return true;
+        return (m.title.toLowerCase().includes(q) || m.body.toLowerCase().includes(q));
+      })
+      .sort((a,b) => (b.updated.localeCompare(a.updated)));
+  };
+
+  const render = () => {
+    const list = filteredMemos();
+    itemsEl.innerHTML = "";
+
+    if (list.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "hint";
+      empty.textContent = "メモがありません（保存するとここに出ます）";
+      itemsEl.appendChild(empty);
+      return;
     }
 
-    // 保存
-    saveBtn.addEventListener("click", () => {
-      localStorage.setItem(KEY, memoEl.value);
-      statusEl.textContent = "保存しました。";
-    });
+    for (const m of list) {
+      const item = document.createElement("div");
+      item.className = "item";
 
-    // 削除（確認つき）
-    clearBtn.addEventListener("click", () => {
-      if (!confirm("メモを削除します。よろしいですか？")) return;
-      localStorage.removeItem(KEY);
-      memoEl.value = "";
-      statusEl.textContent = "削除しました。";
-    });
+      const left = document.createElement("div");
+      left.className = "itemLeft";
 
-    // JSON書き出し（バックアップ）
-    function pad2(n) { return String(n).padStart(2, "0"); }
-    function buildTimestamp(d) {
-      return d.getFullYear()
-        + pad2(d.getMonth() + 1)
-        + pad2(d.getDate())
-        + "-"
-        + pad2(d.getHours())
-        + pad2(d.getMinutes())
-        + pad2(d.getSeconds());
-    }
+      const top = document.createElement("div");
+      top.className = "itemTop";
 
-    exportBtn.addEventListener("click", () => {
-      const data = {
-        app: "memo-app",
-        version: 1,
-        exportedAt: new Date().toISOString(),
-        text: memoEl.value
-      };
+      const badge = document.createElement("span");
+      badge.className = "badge " + (m.status === "done" ? "done" : "todo");
+      badge.textContent = (m.status === "done" ? "済" : "未");
 
-      const json = JSON.stringify(data, null, 2);
-      const blob = new Blob([json], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
+      const t = document.createElement("div");
+      t.className = "itemTitle";
+      t.textContent = m.title || "（無題）";
 
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `memo-backup-${buildTimestamp(new Date())}.json`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
+      top.appendChild(badge);
+      top.appendChild(t);
 
-      URL.revokeObjectURL(url);
-      statusEl.textContent = "JSONを書き出しました。";
-    });
+      const meta = document.createElement("div");
+      meta.className = "itemMeta";
+      const bodyOneLine = (m.body || "").replace(/\s+/g," ").trim();
+      meta.textContent = `${m.updated} / ${bodyOneLine.slice(0, 60)}${bodyOneLine.length > 60 ? "…" : ""}`;
 
-    // JSON読み込み（復元）
-    importFile.addEventListener("change", async () => {
-      if (!importFile.files || !importFile.files[0]) return;
+      left.appendChild(top);
+      left.appendChild(meta);
 
-      try {
-        const file = importFile.files[0];
-        const text = await file.text();
-        const obj = JSON.parse(text);
+      const btns = document.createElement("div");
+      btns.className = "itemBtns";
 
-        const importedText =
-          (obj && typeof obj === "object" && "text" in obj) ? String(obj.text) :
-          (typeof obj === "string") ? obj :
-          null;
+      const openBtn = document.createElement("button");
+      openBtn.className = "secondary tiny";
+      openBtn.textContent = "開く";
+      openBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        setEditor(m);
+      });
 
-        if (importedText === null) {
-          alert("このJSONは読み込めません（形式が違います）。");
-          return;
+      const statBtn = document.createElement("button");
+      statBtn.className = "secondary tiny";
+      statBtn.textContent = "未/済";
+      statBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        m.status = (m.status === "done" ? "todo" : "done");
+        m.updated = nowStr();
+        saveAll();
+        render();
+        if (currentId === m.id) {
+          currentStatus = m.status;
+          currentInfo.textContent = `編集中: ${m.status === "done" ? "済" : "未"} / 更新: ${m.updated}`;
         }
+      });
 
-        if (!confirm("このJSONでメモを置き換えます。よろしいですか？")) return;
+      const delBtn = document.createElement("button");
+      delBtn.className = "danger tiny";
+      delBtn.textContent = "削除";
+      delBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (!confirm("このメモを削除しますか？")) return;
+        memos = memos.filter(x => x.id !== m.id);
+        saveAll();
+        if (currentId === m.id) setEditor(null);
+        render();
+      });
 
-        memoEl.value = importedText;
-        localStorage.setItem(KEY, importedText);
-        statusEl.textContent = "JSONから復元しました。";
+      btns.appendChild(openBtn);
+      btns.appendChild(statBtn);
+      btns.appendChild(delBtn);
 
-      } catch (e) {
-        console.error(e);
-        alert("JSONの読み込みに失敗しました。ファイルが壊れているか形式が違います。");
-      } finally {
-        // 同じファイルを続けて選べるようにリセット
-        importFile.value = "";
+      item.appendChild(left);
+      item.appendChild(btns);
+
+      item.addEventListener("click", () => setEditor(m));
+      itemsEl.appendChild(item);
+    }
+  };
+
+  // ====== Actions ======
+  const doDraft = () => {
+    const snap = getEditorSnapshot();
+    saveDraft(snap);
+    setSaveState("draft", "下書き保存");
+    setTimeout(() => setSaveState(dirty ? "dirty" : "idle", dirty ? "未保存" : "待機中"), 800);
+  };
+
+  const doSave = () => {
+    const t = titleInput.value.trim();
+    const b = bodyInput.value;
+    if (!t && !b.trim()) {
+      alert("タイトルも本文も空です。何か入力してから保存してください。");
+      return;
+    }
+
+    const at = nowStr();
+    if (!currentId) {
+      const m = {
+        id: uid(),
+        title: t,
+        body: b,
+        status: currentStatus || "todo",
+        created: at,
+        updated: at,
+      };
+      memos.push(m);
+      saveAll();
+      setEditor(m);
+    } else {
+      const m = findMemo(currentId);
+      if (!m) {
+        // 何かの理由で無い場合、新規として保存
+        const nm = { id: uid(), title:t, body:b, status: currentStatus || "todo", created: at, updated: at };
+        memos.push(nm);
+        saveAll();
+        setEditor(nm);
+      } else {
+        m.title = t;
+        m.body  = b;
+        m.status = currentStatus || m.status || "todo";
+        m.updated = at;
+        saveAll();
+        setEditor(m);
       }
+    }
+
+    // 下書きは消す（保存できたら不要）
+    localStorage.removeItem(KEY_DRAFT);
+    setSaveState("saved", "保存しました");
+    setTimeout(() => setSaveState("idle", "待機中"), 900);
+    render();
+  };
+
+  const doNew = () => {
+    if (dirty && !confirm("未保存の変更があります。新規に切り替えますか？")) return;
+    setEditor(null);
+    setSaveState("idle", "待機中");
+  };
+
+  const doDeleteCurrent = () => {
+    if (!currentId) {
+      alert("削除するメモがありません（編集中のメモが未選択です）。");
+      return;
+    }
+    if (!confirm("編集中のメモを削除しますか？")) return;
+    memos = memos.filter(m => m.id !== currentId);
+    saveAll();
+    setEditor(null);
+    render();
+  };
+
+  const doToggleStatus = () => {
+    currentStatus = (currentStatus === "done" ? "todo" : "done");
+    const label = currentStatus === "done" ? "済" : "未";
+    currentInfo.textContent = currentId
+      ? `編集中: ${label} / （保存すると反映）`
+      : `新規メモ（${label}）`;
+    setDirty(true);
+  };
+
+  // ====== Export / Import ======
+  const exportJSON = () => {
+    const payload = {
+      app: "Myメモ",
+      version: 1,
+      exported: nowStr(),
+      memos: memos
+    };
+    const ymd = new Date();
+    const pad = (n) => String(n).padStart(2,"0");
+    const fname = `mymemo_${ymd.getFullYear()}${pad(ymd.getMonth()+1)}${pad(ymd.getDate())}.json`;
+    downloadBlob(JSON.stringify(payload, null, 2), fname, "application/json;charset=utf-8");
+  };
+
+  const importJSON = () => {
+    importFile.value = "";
+    importFile.click();
+  };
+
+  const mergeMemos = (incoming) => {
+    // IDで統合。既存優先 or 新規優先の選択余地はあるが、今は「新しいupdatedを優先」
+    const map = new Map(memos.map(m => [m.id, m]));
+    for (const m of incoming) {
+      const norm = {
+        id: String(m.id || uid()),
+        title: (m.title ?? "").toString(),
+        body: (m.body ?? "").toString(),
+        status: (m.status === "done") ? "done" : "todo",
+        created: (m.created ?? nowStr()).toString(),
+        updated: (m.updated ?? nowStr()).toString(),
+      };
+      const exist = map.get(norm.id);
+      if (!exist) map.set(norm.id, norm);
+      else {
+        // updatedが新しい方を採用
+        if ((norm.updated || "") >= (exist.updated || "")) {
+          map.set(norm.id, norm);
+        }
+      }
+    }
+    memos = Array.from(map.values());
+    saveAll();
+  };
+
+  importFile.addEventListener("change", async () => {
+    const file = importFile.files && importFile.files[0];
+    if (!file) return;
+    const text = await file.text();
+    const p = safeParse(text);
+    if (!p.ok) {
+      alert("JSONの読み込みに失敗しました。ファイル内容を確認してください。");
+      setSaveState("error", "JSON読込失敗");
+      setTimeout(() => setSaveState("idle", "待機中"), 1200);
+      return;
+    }
+
+    // 受け入れ形式:
+    // 1) { memos: [...] }
+    // 2) [...] (配列だけ)
+    let incoming = null;
+    if (Array.isArray(p.data)) incoming = p.data;
+    else if (p.data && Array.isArray(p.data.memos)) incoming = p.data.memos;
+
+    if (!incoming) {
+      alert("このJSONは対応形式ではありません。（memos配列が必要）");
+      return;
+    }
+
+    const before = memos.length;
+    mergeMemos(incoming);
+    const after = memos.length;
+
+    render();
+    setSaveState("saved", `復元OK（${before}→${after}件）`);
+    setTimeout(() => setSaveState("idle", "待機中"), 1200);
+  });
+
+  const exportCSV = () => {
+    // CSV columns: id,title,body,status,created,updated
+    const header = ["id","title","body","status","created","updated"];
+    const lines = [header.join(",")];
+    const list = memos.slice().sort((a,b) => (b.updated.localeCompare(a.updated)));
+    for (const m of list) {
+      const row = [
+        escapeCsv(m.id),
+        escapeCsv(m.title),
+        escapeCsv(m.body),
+        escapeCsv(m.status),
+        escapeCsv(m.created),
+        escapeCsv(m.updated),
+      ];
+      lines.push(row.join(","));
+    }
+    const ymd = new Date();
+    const pad = (n) => String(n).padStart(2,"0");
+    const fname = `mymemo_${ymd.getFullYear()}${pad(ymd.getMonth()+1)}${pad(ymd.getDate())}.csv`;
+    downloadBlob(lines.join("\n"), fname, "text/csv;charset=utf-8");
+  };
+
+  // ====== Events ======
+  titleInput.addEventListener("input", () => setDirty(true));
+  bodyInput.addEventListener("input", () => setDirty(true));
+  searchInput.addEventListener("input", () => render());
+
+  draftBtn.addEventListener("click", doDraft);
+  saveBtn.addEventListener("click", doSave);
+  newBtn.addEventListener("click", doNew);
+  deleteBtn.addEventListener("click", doDeleteCurrent);
+  toggleStatusBtn.addEventListener("click", doToggleStatus);
+
+  exportJsonBtn.addEventListener("click", exportJSON);
+  importJsonBtn.addEventListener("click", importJSON);
+  exportCsvBtn.addEventListener("click", exportCSV);
+
+  // Filter buttons
+  document.querySelectorAll('[data-filter]').forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      filterMode = btn.getAttribute("data-filter");
+      render();
     });
-  </script>
+  });
+
+  // beforeunload warning
+  window.addEventListener("beforeunload", (e) => {
+    if (!dirty) return;
+    e.preventDefault();
+    e.returnValue = "";
+  });
+
+  // ====== Init ======
+  memos = loadAll();
+
+  // 下書きがあれば復元（任意）
+  const draft = loadDraft();
+  if (draft && (draft.title || (draft.body && draft.body.trim()))) {
+    // 直前の編集中メモの復元より、下書きを優先して開く
+    titleInput.value = (draft.title ?? "");
+    bodyInput.value = (draft.body ?? "");
+    currentId = draft.id || null;
+    currentStatus = draft.status === "done" ? "done" : "todo";
+    currentInfo.textContent = `下書き復元: ${currentStatus === "done" ? "済" : "未"} / ${draft.at || ""}`;
+    setSaveState("draft", "下書き復元");
+    setTimeout(() => setSaveState("idle", "待機中"), 900);
+  } else {
+    const lastId = getLastId();
+    const last = lastId ? findMemo(lastId) : null;
+    if (last) setEditor(last);
+    else setEditor(null);
+  }
+
+  render();
+})();
+</script>
 </body>
 </html>
+
 
 
 
