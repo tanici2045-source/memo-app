@@ -1,3 +1,5 @@
+alert("app.js 読み込みOK");
+
 // My Log v0.2.1 - iPhone Safari safe action menu
 (() => {
   "use strict";
