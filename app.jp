@@ -1,1 +1,171 @@
-app.js
+// My Log v0.2.1 - iPhone Safari safe action menu
+(() => {
+  "use strict";
+
+  const STORAGE_KEY_ITEMS = "mylog_items_v1";
+  const STORAGE_KEY_DRAFT = "mylog_draft_v1";
+  const LIST_LIMIT = 80;
+
+  const $ = (id) => document.getElementById(id);
+
+  function todayISO() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  }
+
+  function pad2(n) {
+    return String(n).padStart(2, "0");
+  }
+
+  function rand6() {
+    return Math.random().toString(36).slice(2, 8);
+  }
+
+  function makeId(prefix) {
+    const d = new Date();
+    return `${prefix}_${d.getFullYear()}${pad2(d.getMonth()+1)}${pad2(d.getDate())}_${pad2(d.getHours())}${pad2(d.getMinutes())}${pad2(d.getSeconds())}_${rand6()}`;
+  }
+
+  function loadItems() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY_ITEMS) || "[]");
+    } catch {
+      return [];
+    }
+  }
+
+  function saveItems(items) {
+    localStorage.setItem(STORAGE_KEY_ITEMS, JSON.stringify(items));
+  }
+
+  function renderList() {
+    const listEl = $("listArea");
+    if (!listEl) return;
+
+    const items = loadItems().slice(0, LIST_LIMIT).filter(x => x.type === "memo");
+
+    if (items.length === 0) {
+      listEl.innerHTML = `<div class="item">（まだ保存データがありません）</div>`;
+      return;
+    }
+
+    listEl.innerHTML = items.map(x => `
+      <div class="item">
+        <div style="font-size:12px;color:#666;">${x.date}</div>
+        <div><b>Myメモ</b>：${x.memo || ""}</div>
+        <div>意見：${x.opinion || ""}</div>
+        <div>感想：${x.impression || ""}</div>
+      </div>
+    `).join("");
+  }
+
+  function getForm() {
+    return {
+      date: $("date")?.value || todayISO(),
+      memo: $("memo")?.value || "",
+      opinion: $("opinion")?.value || "",
+      impression: $("impression")?.value || "",
+    };
+  }
+
+  function clearForm() {
+    ["memo","opinion","impression"].forEach(id => {
+      if ($(id)) $(id).value = "";
+    });
+  }
+
+  function saveMemo() {
+    const d = getForm();
+    if ((d.memo + d.opinion + d.impression).trim() === "") {
+      alert("空なので保存しません。");
+      return;
+    }
+
+    const item = {
+      id: makeId("m"),
+      type: "memo",
+      ...d,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    const items = loadItems();
+    items.unshift(item);
+    saveItems(items);
+    localStorage.removeItem(STORAGE_KEY_DRAFT);
+    renderList();
+    alert("保存しました。");
+  }
+
+  function saveDraft() {
+    localStorage.setItem(STORAGE_KEY_DRAFT, JSON.stringify(getForm()));
+    alert("下書きを保存しました。");
+  }
+
+  function restoreDraft() {
+    try {
+      const d = JSON.parse(localStorage.getItem(STORAGE_KEY_DRAFT) || "null");
+      if (!d) return;
+      ["date","memo","opinion","impression"].forEach(k => {
+        if ($(k) && d[k]) $(k).value = d[k];
+      });
+    } catch {}
+  }
+
+  function exportCsv() {
+    const items = loadItems().filter(x => x.type === "memo").reverse();
+    if (!items.length) { alert("データがありません"); return; }
+
+    const head = ["id","date","memo","opinion","impression","createdAt","updatedAt"];
+    const esc = v => `"${String(v||"").replaceAll('"','""')}"`;
+    const rows = [head.join(",")].concat(items.map(x => head.map(k => esc(x[k])).join(",")));
+    const blob = new Blob([rows.join("\n")], {type:"text/csv"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "mylog_memo.csv";
+    a.click();
+  }
+
+  function toggleMenu() {
+    const m = $("actionMenu");
+    if (!m) return;
+    m.style.display = (m.style.display === "block") ? "none" : "block";
+  }
+
+  function hideMenu() {
+    const m = $("actionMenu");
+    if (m) m.style.display = "none";
+  }
+
+  function bind() {
+    if ($("date") && !$("date").value) $("date").value = todayISO();
+
+    $("menuAction")?.addEventListener("click", e => {
+      e.stopPropagation();
+      toggleMenu();
+    });
+
+    $("actionMenu")?.addEventListener("click", e => {
+      const act = e.target.getAttribute("data-act");
+      hideMenu();
+      if (act === "save") saveMemo();
+      if (act === "refresh") renderList();
+      if (act === "csv") exportCsv();
+    });
+
+    document.addEventListener("click", hideMenu);
+    $("draftBtn")?.addEventListener("click", saveDraft);
+    $("clearBtn")?.addEventListener("click", () => {
+      if (confirm("入力をクリアしますか？")) clearForm();
+    });
+
+    restoreDraft();
+    renderList();
+  }
+
+  document.addEventListener("DOMContentLoaded", bind);
+})();
+
