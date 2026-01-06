@@ -103,3 +103,6 @@ const render = () => {
     itemsEl.appendChild(item);
   }
 };
+window.render = render;
+window.filteredMemos = filteredMemos;
+
