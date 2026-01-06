@@ -202,7 +202,7 @@
 
   console.log("JS LOADED");
 
-(() => {
+
   // ====== Storage Keys ======
   const KEY_DATA  = "mymemo:data:v1";   // 本保存
   const KEY_DRAFT = "mymemo:draft:v1";  // 下書き
@@ -301,7 +301,7 @@
       status: (m.status === "done") ? "done" : "todo",
       created: (m.created ?? nowStr()).toString(),
       updated: (m.updated ?? nowStr()).toString(),
-    }));
+    
   };
 
   const saveAll = () => {
