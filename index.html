@@ -289,24 +289,25 @@
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
+// ====== Load / Save ======
+const loadAll = () => {
+  const raw = localStorage.getItem(KEY_DATA);
+  if (!raw) return [];
+  const p = safeParse(raw);
+  if (!p.ok) return [];
+  if (!Array.isArray(p.data)) return [];
+  // normalize
+  return p.data.map(m => ({
+    id: String(m.id || uid()),
+    title: (m.title ?? "").toString(),
+    body: (m.body ?? "").toString(),
+    status: (m.status === "done") ? "done" : "todo",
+    created: (m.created ?? nowStr()).toString(),
+    updated: (m.updated ?? nowStr()).toString(),
+  }));
+};
 
-  // ====== Load / Save ======
-  const loadAll = () => {
-    const raw = localStorage.getItem(KEY_DATA);
-    if (!raw) return [];
-    const p = safeParse(raw);
-    if (!p.ok) return [];
-    if (!Array.isArray(p.data)) return [];
-    // normalize
-    return p.data.map(m => ({
-      id: String(m.id || uid()),
-      title: (m.title ?? "").toString(),
-      body: (m.body ?? "").toString(),
-      status: (m.status === "done") ? "done" : "todo",
-      created: (m.created ?? nowStr()).toString(),
-      updated: (m.updated ?? nowStr()).toString(),
-    
-    }));
+ 
 
 
   const saveAll = () => {
