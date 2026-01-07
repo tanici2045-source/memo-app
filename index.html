@@ -439,7 +439,8 @@ const loadAll = () => {
     memos = memos.filter(m => m.id !== currentId);
     saveAll();
     setEditor(null);
-    render();
+    if (typeof window.render === "function") window.render();
+
   };
 
   const doToggleStatus = () => {
@@ -608,11 +609,12 @@ const loadAll = () => {
   }
 
   
-})();
+
 </script>
 <script src="js/render.js"></script>   
 <script>
-  render();//初回描画
+  if (typeof window.render === "function") window.render();
+
 </script>
   
 </body>
