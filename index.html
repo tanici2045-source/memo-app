@@ -575,7 +575,7 @@ const loadAll = () => {
       document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
       filterMode = btn.getAttribute("data-filter");
-      render();
+      if (typeof window.render === "function") window.render();
     });
   });
 
