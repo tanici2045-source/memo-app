@@ -553,7 +553,11 @@ const loadAll = () => {
   // ====== Events ======
   titleInput.addEventListener("input", () => setDirty(true));
   bodyInput.addEventListener("input", () => setDirty(true));
-  searchInput.addEventListener("input", () => render());
+  
+  searchInput.addEventListener("input", () => {
+  if (typeof window.render === "function") window.render();
+});
+  
 
   draftBtn.addEventListener("click", doDraft);
   saveBtn.addEventListener("click", doSave);
