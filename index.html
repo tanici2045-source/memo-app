@@ -588,7 +588,7 @@ const loadAll = () => {
 
   // ====== Init ======
   memos = loadAll();
-
+  window.memos = memos;   // ← ★これを必ず追加
   // 下書きがあれば復元（任意）
   const draft = loadDraft();
   if (draft && (draft.title || (draft.body && draft.body.trim()))) {
