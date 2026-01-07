@@ -306,7 +306,8 @@
       created: (m.created ?? nowStr()).toString(),
       updated: (m.updated ?? nowStr()).toString(),
     
-  };
+    }));
+  }:  
 
   const saveAll = () => {
     localStorage.setItem(KEY_DATA, JSON.stringify(memos, null, 2));
