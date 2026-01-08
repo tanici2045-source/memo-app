@@ -421,7 +421,7 @@ const loadAll = () => {
     localStorage.removeItem(KEY_DRAFT);
     setSaveState("saved", "保存しました");
     setTimeout(() => setSaveState("idle", "待機中"), 900);
-    render();
+    window.render();
   };
 
   const doNew = () => {
@@ -524,7 +524,7 @@ const loadAll = () => {
     mergeMemos(incoming);
     const after = memos.length;
 
-    render();
+    window.render();
     setSaveState("saved", `復元OK（${before}→${after}件）`);
     setTimeout(() => setSaveState("idle", "待機中"), 1200);
   });
