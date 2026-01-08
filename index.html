@@ -425,6 +425,8 @@ const loadAll = () => {
     localStorage.removeItem(KEY_DRAFT);
     setSaveState("saved", "保存しました");
     setTimeout(() => setSaveState("idle", "待機中"), 900);
+    App.state.memos = memos;
+    // 再描画
     window.render();
   };
 
@@ -442,7 +444,11 @@ const loadAll = () => {
     if (!confirm("編集中のメモを削除しますか？")) return;
     memos = memos.filter(m => m.id !== currentId);
     saveAll();
+    // ★ 同期
+    App.state.memos = memos;
     setEditor(null);
+    window.render();
+    //追加される2026/1/8
     if (typeof window.render === "function") window.render();
 
   };
