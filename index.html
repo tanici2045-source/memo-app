@@ -126,7 +126,7 @@
     </header>
 <!-- ⋯ アクションメニュー（v0.2.1） -->
 <div id="actionMenu" style="
-  display:block;
+  display:none;
   position:fixed;
   top:60px;
   right:12px;
@@ -613,10 +613,7 @@ const loadAll = () => {
 </script>
 <script src="js/render.js"></script>   
 
- <script>
-  console.log("RENDER FUNC:", typeof window.render);
-  if (typeof window.render === "function") window.render(); 
-</script>
+ 
  
 </body>
 </html>
