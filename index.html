@@ -657,6 +657,8 @@ actionMenu.addEventListener("click", (e) => {
   });
 
   // ====== Init ======
+  App.state.memos = memos;
+
   memos = loadAll();
   window.memos = memos;   // ← ★これを必ず追加
   // 下書きがあれば復元（任意）
