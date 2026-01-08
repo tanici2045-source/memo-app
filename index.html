@@ -612,12 +612,10 @@ const loadAll = () => {
 
 </script>
 <script src="js/render.js"></script>   
-<script>
-  if (typeof window.render === "function") window.render();
 
-</script>
  <script>
   console.log("RENDER FUNC:", typeof window.render);
+  if (typeof window.render === "function") window.render(); 
 </script>
  
 </body>
