@@ -1,5 +1,6 @@
 // js/app.js
 window.App = window.App || {};
+const App = window.App;
 App.state = App.state || { memos: [] };
 App.util = App.util || {};
 App.util.nowStr = App.util.nowStr || (() => {
