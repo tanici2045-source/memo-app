@@ -1,5 +1,6 @@
 // js/storage.js
 window.App = window.App || {};
+const App = window.App;
 
 App.storage = (() => {
   const downloadBlob = (content, filename, type) => {
