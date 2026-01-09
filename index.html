@@ -641,7 +641,8 @@ actionMenu.addEventListener("click", (e) => {
   deleteBtn.addEventListener("click", doDeleteCurrent);
   toggleStatusBtn.addEventListener("click", doToggleStatus);
 
-  exportJsonBtn.addEventListener("click", exportJSON);
+  exportJsonBtn.addEventListener("click", () => App.actions.exportJSON());
+
   importJsonBtn.addEventListener("click", importJSON);
   exportCsvBtn.addEventListener("click", exportCSV);
 
