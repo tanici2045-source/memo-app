@@ -440,6 +440,9 @@ const loadAll = () => {
     localStorage.removeItem(KEY_DRAFT);
     setSaveState("saved", "保存しました");
     setTimeout(() => setSaveState("idle", "待機中"), 900);
+    
+    window.App = window.App || {};
+　　const App = window.App;
     App.state.memos = memos;
     // 再描画
     window.render();
