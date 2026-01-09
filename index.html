@@ -462,19 +462,8 @@ const loadAll = () => {
     setDirty(true);
   };
 
-  // ====== Export / Import ======
-  const exportJSON = () => {
-    const payload = {
-      app: "Myメモ",
-      version: 1,
-      exported: nowStr(),
-      memos: memos
-    };
-    const ymd = new Date();
-    const pad = (n) => String(n).padStart(2,"0");
-    const fname = `mymemo_${ymd.getFullYear()}${pad(ymd.getMonth()+1)}${pad(ymd.getDate())}.json`;
-    downloadBlob(JSON.stringify(payload, null, 2), fname, "application/json;charset=utf-8");
-  };
+  // ====== / Import ======
+
 
   const importJSON = () => {
     importFile.value = "";
