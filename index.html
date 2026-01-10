@@ -463,7 +463,8 @@ const loadAll = () => {
     memos = memos.filter(m => m.id !== currentId);
     saveAll();
     // ★ 同期
-    App.state.memos = memos;
+    window.App.state.memos = memos;
+
     setEditor(null);
     window.render();
     //追加される2026/1/8
