@@ -54,4 +54,6 @@ App.actions = (() => {
   };
 
   return { exportCSV, exportJSON };
+  
 })();
+window.App.actions = App.actions;
