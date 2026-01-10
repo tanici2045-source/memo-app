@@ -653,7 +653,9 @@ if (menuAction && actionMenu) {
     currentId = draft.id || null;
     currentStatus = draft.status === "done" ? "done" : "todo";
     
-    setSaveState("draft", "下書き復元");currentInfo.textContent = `下書き復元: ${currentStatus === "done" ? "済" : "未"} / ${draft.at || ""}`;
+    setSaveState("draft", "下書き復元");
+    currentInfo.textContent =
+     `下書き復元: ${currentStatus === "done" ? "済" : "未"} / ${draft.at || ""}`;
 
     setTimeout(() => setSaveState("idle", "待機中"), 900);
   } else {
