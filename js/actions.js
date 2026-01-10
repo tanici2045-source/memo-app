@@ -1,11 +1,15 @@
 // js/actions.js
-window.App = window.App || {};
-const App = window.App;
 
-App.actions = (() => {
-  const exportCSV = () => {
-    const { escapeCsv, downloadBlob } = App.storage;
-    const memos = App.state.memos;
+ window.App = window.App || {};
+ App.actions = App.actions || {};
+ App.actions.doSave = () => {
+ console.log("doSave called");
+ };
+ App.actions.exportCSV = () => {
+ const { escapeCsv, downloadBlob } = App.storage;
+ const memos = App.state.memos;
+ };
+
 
     const header = ["id","title","body","status","created","updated"];
     const lines = [header.join(",")];
