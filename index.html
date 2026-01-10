@@ -645,13 +645,22 @@ if (menuAction && actionMenu) {
   App.state.memos = memos;
   window.memos = memos;   // ← ★これを必ず追加
   // 下書きがあれば復元（任意）
-  const draft = loadDraft();
-  if (draft && (draft.title || (draft.body && draft.body.trim()))) {
-    // 直前の編集中メモの復元より、下書きを優先して開く
-    titleInput.value = (draft.title ?? "");
-    bodyInput.value = (draft.body ?? "");
-    currentId = draft.id || null;
-    currentStatus = draft.status === "done" ? "done" : "todo";
+const draft = loadDraft();
+
+const hasDraft =
+  !!draft &&
+  (
+    (draft.title && String(draft.title).trim() !== "") ||
+    (draft.body  && String(draft.body).trim()  !== "")
+  );
+
+if (hasDraft) {
+  // 直前の編集中メモの復元より、下書きを優先して開く
+  titleInput.value = draft.title ?? "";
+  bodyInput.value  = draft.body  ?? "";
+  currentId = draft.id || null;
+  currentStatus = draft.status === "done" ? "done" : "todo";
+
     
     setSaveState("draft", "下書き復元");
     currentInfo.textContent =
@@ -664,7 +673,7 @@ if (menuAction && actionMenu) {
     if (last) setEditor(last);
     else setEditor(null);
   }
-//})();
+})();
 </script>
   
 
