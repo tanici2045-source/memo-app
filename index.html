@@ -613,7 +613,9 @@ if (menuAction && actionMenu) {
   
 
   draftBtn.addEventListener("click", doDraft);
-  saveBtn.addEventListener("click", doSave);
+  //saveBtn.addEventListener("click", doSave);
+  saveBtn.addEventListener("click", App.actions.doSave);
+  
   newBtn.addEventListener("click", doNew);
   deleteBtn.addEventListener("click", doDeleteCurrent);
   toggleStatusBtn.addEventListener("click", doToggleStatus);
