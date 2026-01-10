@@ -440,13 +440,11 @@ const loadAll = () => {
     localStorage.removeItem(KEY_DRAFT);
     setSaveState("saved", "保存しました");
     setTimeout(() => setSaveState("idle", "待機中"), 900);
-    
     window.App = window.App || {};
 　　const App = window.App;
-    widow.App.state.memos = memos;
-    // 再描画
+    window.App.state.memos = memos;
     window.render();
-  };
+};
 
   const doNew = () => {
     if (dirty && !confirm("未保存の変更があります。新規に切り替えますか？")) return;
@@ -599,9 +597,8 @@ if (menuAction && actionMenu) {
 
     if (act === "save") doSave();
     if (act === "refresh") location.reload();
-    if (act === "csv") App.actions.exportCSV();
-    if (act === "json") App.actions.exportJSON();
-
+    if (act === "csv") exportCSV();
+    //if (act === "json") App.actions.exportJSON();
     actionMenu.classList.remove("show");
   });
 }
@@ -655,8 +652,9 @@ if (menuAction && actionMenu) {
     bodyInput.value = (draft.body ?? "");
     currentId = draft.id || null;
     currentStatus = draft.status === "done" ? "done" : "todo";
-    currentInfo.textContent = `下書き復元: ${currentStatus === "done" ? "済" : "未"} / ${draft.at || ""}';
-    setSaveState("draft", "下書き復元");
+    
+    setSaveState("draft", "下書き復元");currentInfo.textContent = `下書き復元: ${currentStatus === "done" ? "済" : "未"} / ${draft.at || ""}`;
+
     setTimeout(() => setSaveState("idle", "待機中"), 900);
   } else {
     const lastId = getLastId();
