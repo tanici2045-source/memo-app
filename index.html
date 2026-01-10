@@ -570,69 +570,41 @@ const loadAll = () => {
 
 //
 // ====== actionMenu（⋯メニュー）=====
+// ====== actionMenu（⋯メニュー）=====
 console.log("menuAction?", !!menuAction, "actionMenu?", !!actionMenu);
+
 if (menuAction && actionMenu) {
-const openActionMenu = () => { actionMenu.style.display = "block"; };
-const closeActionMenu = () => { actionMenu.style.display = "none"; };
-const isMenuOpen = () => actionMenu.style.display !== "none";
-const toggleActionMenu = () => { isMenuOpen() ? closeActionMenu() : openActionMenu(); };
-
+  // ⋯ボタンで開閉
   menuAction.addEventListener("click", (e) => {
-e.preventDefault();
-toggleActionMenu();
-});
+    e.preventDefault();
+    e.stopPropagation();
+    actionMenu.classList.toggle("show");
+  });
 
-document.addEventListener("click", (e) => {
-const t = e.target;
-if (t === menuAction) return;
-if (actionMenu.contains(t)) return;
-closeActionMenu();
-});
+  // 外側クリックで閉じる
+  document.addEventListener("click", (e) => {
+    const t = e.target;
+    if (t === menuAction) return;
+    if (actionMenu.contains(t)) return;
+    actionMenu.classList.remove("show");
+  });
 
-actionMenu.addEventListener("click", (e) => {
-const btn = e.target.closest("[data-act]");
-if (!btn) return;
-const act = btn.getAttribute("data-act");
+  // メニュー内クリック（イベント委譲）
+  actionMenu.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-act]");
+    if (!btn) return;
 
-if (act === "save") doSave();
-if (act === "refresh") location.reload();
-if (act === "csv") exportCSV();
+    const act = btn.getAttribute("data-act");
 
-closeActionMenu();
-});
+    if (act === "save") doSave();
+    if (act === "refresh") location.reload();
+    if (act === "csv") App.actions.exportCSV();
+    if (act === "json") App.actions.exportJSON();
+
+    actionMenu.classList.remove("show");
+  });
 }
- // kokomade                                                                                                                                                 
-
-// ⋯ボタンで開閉
-menuAction.addEventListener("click", (e) => {
-  e.preventDefault();
-  toggleActionMenu();
-});
-
-// 外側クリックで閉じる（開いて即閉じを防ぐ）
-document.addEventListener("click", (e) => {
-  const t = e.target;
-  if (t === menuAction) return;
-  if (actionMenu.contains(t)) return;
-  closeActionMenu();
-});
-
-// メニュー内クリック（イベント委譲）
-actionMenu.addEventListener("click", (e) => {
-  const btn = e.target.closest("[data-act]");
-  if (!btn) return;
-  const act = btn.getAttribute("data-act");
-
-  if (act === "save") doSave();
-  if (act === "refresh") location.reload();
-  if (act === "csv") exportCSV();
-
-  closeActionMenu();
-});
-
-
-
- //   
+//   
   // ====== Events ======
   titleInput.addEventListener("input", () => setDirty(true));
   bodyInput.addEventListener("input", () => setDirty(true));
