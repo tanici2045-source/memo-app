@@ -397,7 +397,7 @@ const loadAll = () => {
     setTimeout(() => setSaveState(dirty ? "dirty" : "idle", dirty ? "未保存" : "待機中"), 800);
   };
 
-  const doSave = () => {
+ App.actions.doSave = () => {
     const t = titleInput.value.trim();
     const b = bodyInput.value;
     if (!t && !b.trim()) {
