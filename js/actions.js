@@ -1,5 +1,5 @@
 // js/actions.js
-
+window.App = window.App || {};
 const App = window.App;
 
 App.actions = (() => {
