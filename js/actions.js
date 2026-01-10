@@ -57,3 +57,5 @@ App.actions = (() => {
   
 })();
 window.App.actions = App.actions;
+App.actions = App.actions || {};
+
