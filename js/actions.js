@@ -6,6 +6,7 @@ App.actions = App.actions || {};
 App.actions.doSave = () => {
   // DOM を自分で取りに行く（App.dom が無くても動く）
   const bodyEl = document.getElementById("bodyInput");
+  
   if (!bodyEl) {
     alert("bodyInput が見つかりません");
     return;
@@ -24,7 +25,8 @@ App.actions.doSave = () => {
 
   const now = new Date();
   const pad = (n) => String(n).padStart(2, "0");
-  const nowStr = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  const nowStr =
+    `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
 
   memos.push({
     id: "m_" + Date.now().toString(36),
