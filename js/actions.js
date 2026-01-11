@@ -1,65 +1,70 @@
 // js/actions.js
 
- window.App = window.App || {};
- App.actions = App.actions || {};
- App.actions.doSave = () => {
- console.log("doSave called");
- };
- App.actions.exportCSV = () => {
- const { escapeCsv, downloadBlob } = App.storage;
- const memos = App.state.memos;
- };
+window.App = window.App || {};
+const App = window.App;
 
-
-    const header = ["id","title","body","status","created","updated"];
-    const lines = [header.join(",")];
-
-    const list = memos.slice().sort((a,b) => (b.updated.localeCompare(a.updated)));
-    for (const m of list) {
-      lines.push([
-        escapeCsv(m.id),
-        escapeCsv(m.title),
-        escapeCsv(m.body),
-        escapeCsv(m.status),
-        escapeCsv(m.created),
-        escapeCsv(m.updated),
-      ].join(","));
-    }
-
-    const d = new Date();
-    const pad = (n) => String(n).padStart(2,"0");
-    const fname = `mymemo_${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}.csv`;
-
-    downloadBlob(lines.join("\n"), fname, "text/csv;charset=utf-8");
-  };
-
-  const exportJSON = () => {
-    const { downloadBlob } = App.storage;
-    const memos = App.state.memos;
-
-    const nowStr = App.util?.nowStr || (() => {
-      const d = new Date();
-      const pad = (n) => String(n).padStart(2,"0");
-      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-    });
-
-    const payload = {
-      app: "Myメモ",
-      version: 1,
-      exported: nowStr(),
-      memos
-    };
-
-    const d = new Date();
-    const pad = (n) => String(n).padStart(2,"0");
-    const fname = `mymemo_${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}.json`;
-
-    downloadBlob(JSON.stringify(payload, null, 2), fname, "application/json;charset=utf-8");
-  };
-
-  return { exportCSV, exportJSON };
-  
-})();
-window.App.actions = App.actions;
 App.actions = App.actions || {};
+
+App.actions.doSave = () => {
+  const memos = App.state.memos;
+
+  const titleInput = App.dom?.titleInput;
+  const bodyInput  = App.dom?.bodyInput;
+
+  if (!titleInput || !bodyInput) {
+    alert("DOM が準備できていません（App.dom が未設定）");
+    return;
+  }
+
+  const t = titleInput.value.trim();
+  const b = bodyInput.value;
+
+  if (!t && !b.trim()) {
+    alert("タイトルも本文も空です。何か入力してから保存してください。");
+    return;
+  }
+
+  const at = App.util.nowStr();
+
+  // currentId / status は state に寄せる
+  const currentId = App.state.currentId || null;
+  const currentStatus = App.state.currentStatus || "todo";
+
+  const uid = App.util.uid;
+
+  if (!currentId) {
+    const m = {
+      id: uid(),
+      title: t,
+      body: b,
+      status: currentStatus,
+      created: at,
+      updated: at,
+    };
+    memos.push(m);
+    App.state.currentId = m.id;
+  } else {
+    const m = memos.find(x => x.id === currentId);
+    if (!m) {
+      const nm = { id: uid(), title:t, body:b, status: currentStatus, created: at, updated: at };
+      memos.push(nm);
+      App.state.currentId = nm.id;
+    } else {
+      m.title = t;
+      m.body = b;
+      m.status = currentStatus;
+      m.updated = at;
+    }
+  }
+
+  // 永続化
+  App.storage.saveAll(memos);
+  localStorage.removeItem(App.storage.KEY_DRAFT);
+
+  // 同期
+  App.state.memos = memos;
+
+  // 再描画（あれば）
+  if (typeof window.render === "function") window.render();
+};
 
