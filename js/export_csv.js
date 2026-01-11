@@ -15,6 +15,7 @@ App.actions.exportCSV = () => {
       escapeCsv(m.id),
       escapeCsv(m.title),
       escapeCsv(m.body),
+      escapeCsv(m.feeling || ""),
       escapeCsv(m.status),
       escapeCsv(m.created),
       escapeCsv(m.updated),
