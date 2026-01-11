@@ -39,7 +39,7 @@
   App.state = App.state || {};
   App.state.memos = App.state.memos || [];
    // ★ここで登録（actions.js 読み込み後なので確実）
-  App.dom.saveBtn.addEventListener("click", () => App.actions.doSave());
+ 
   //ＣＳＶ書き出し
   document.getElementById("exportCsvBtn")
   .addEventListener("click", () => App.actions.exportCSV());
