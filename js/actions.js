@@ -39,5 +39,6 @@ App.actions.doSave = () => {
   });
 
   localStorage.setItem(KEY_DATA, JSON.stringify(memos, null, 2));
+  console.log("SAVED KEY_DATA:", KEY_DATA, "len:", memos.length); // ←この1行
   alert(`保存しました（${memos.length}件）`);
 };
