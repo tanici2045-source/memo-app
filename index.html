@@ -22,14 +22,20 @@
 <script src="js/app.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/actions.js"></script>
+<script src="js/render.js"></script>
 
 <!-- ② 最後に “配線だけ” を書く -->
 <script>
   window.App = window.App || {};
-  App.dom = App.dom || {};
+  App.dom = {
+    bodyInput: document.getElementById("bodyInput"),
+    saveBtn: document.getElementById("saveBtn"),
+  };
   App.state = App.state || {};
   App.state.memos = App.state.memos || [];
-
+   // ★ここで登録（actions.js 読み込み後なので確実）
+  App.dom.saveBtn.addEventListener("click", () => App.actions.doSave());
+  
   // DOM参照
   App.dom.bodyInput = document.getElementById("bodyInput");
   App.dom.saveBtn   = document.getElementById("saveBtn");
