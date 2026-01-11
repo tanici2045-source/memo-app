@@ -32,9 +32,10 @@ App.actions.doSave = () => {
   memos.push({
     id: "m_" + Date.now().toString(36),
     body: text,
+    feeling: feelingEl ? feelingEl.value : "",
     created: nowStr,
     updated: nowStr
-    updated: nowStr
+    
   });
 
   localStorage.setItem(KEY_DATA, JSON.stringify(memos, null, 2));
