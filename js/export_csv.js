@@ -4,11 +4,13 @@ window.App = window.App || {};
 App.actions = App.actions || {};
 
   //
+const memos = JSON.parse(localStorage.getItem("mymemo:data:v1") || "[]");
+
  App.actions.exportCSV = () => {
   const { escapeCsv, downloadBlob } = App.storage;
 
   const KEY_DATA = "mymemo:data:v1";
-  const memos = JSON.parse(localStorage.getItem(KEY_DATA) || "[]"); 
+  
   let memos = [];
   try { memos = JSON.parse(localStorage.getItem(KEY_DATA) || "[]"); } catch(e) { memos = []; }
 
