@@ -6,7 +6,8 @@ App.actions = App.actions || {};
 App.actions.doSave = () => {
   // DOM を自分で取りに行く（App.dom が無くても動く）
   const bodyEl = document.getElementById("bodyInput");
-  
+  const feelingEl = document.getElementById("feelingInput");
+
   if (!bodyEl) {
     alert("bodyInput が見つかりません");
     return;
@@ -32,6 +33,7 @@ App.actions.doSave = () => {
     id: "m_" + Date.now().toString(36),
     body: text,
     created: nowStr,
+    updated: nowStr
     updated: nowStr
   });
 
