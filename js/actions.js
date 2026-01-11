@@ -1,68 +1,38 @@
 // js/actions.js
-
+// actions.js
 window.App = window.App || {};
 App.actions = App.actions || {};
 
 App.actions.doSave = () => {
-  const memos = App.state.memos;
-
-  const titleInput = App.dom?.titleInput;
-  const bodyInput  = App.dom?.bodyInput;
-
-  if (!titleInput || !bodyInput) {
-    alert("DOM が準備できていません（App.dom が未設定）");
+  // DOM を自分で取りに行く（App.dom が無くても動く）
+  const bodyEl = document.getElementById("bodyInput");
+  if (!bodyEl) {
+    alert("bodyInput が見つかりません");
     return;
   }
 
-  const t = titleInput.value.trim();
-  const b = bodyInput.value;
-
-  if (!t && !b.trim()) {
-    alert("タイトルも本文も空です。何か入力してから保存してください。");
+  const text = bodyEl.value || "";
+  if (!text.trim()) {
+    alert("空です。何か書いてから保存してください。");
     return;
   }
 
-  const at = App.util.nowStr();
+  // localStorage に保存（最小）
+  const KEY_DATA = "mymemo:data:v1";
+  let memos = [];
+  try { memos = JSON.parse(localStorage.getItem(KEY_DATA) || "[]"); } catch(e) { memos = []; }
 
-  // currentId / status は state に寄せる
-  const currentId = App.state.currentId || null;
-  const currentStatus = App.state.currentStatus || "todo";
+  const now = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  const nowStr = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
 
-  const uid = App.util.uid;
+  memos.push({
+    id: "m_" + Date.now().toString(36),
+    body: text,
+    created: nowStr,
+    updated: nowStr
+  });
 
-  if (!currentId) {
-    const m = {
-      id: uid(),
-      title: t,
-      body: b,
-      status: currentStatus,
-      created: at,
-      updated: at,
-    };
-    memos.push(m);
-    App.state.currentId = m.id;
-  } else {
-    const m = memos.find(x => x.id === currentId);
-    if (!m) {
-      const nm = { id: uid(), title:t, body:b, status: currentStatus, created: at, updated: at };
-      memos.push(nm);
-      App.state.currentId = nm.id;
-    } else {
-      m.title = t;
-      m.body = b;
-      m.status = currentStatus;
-      m.updated = at;
-    }
-  }
-
-  // 永続化
-  App.storage.saveAll(memos);
-  localStorage.removeItem(App.storage.KEY_DRAFT);
-
-  // 同期
-  App.state.memos = memos;
-
-  // 再描画（あれば）
-  if (typeof window.render === "function") window.render();
+  localStorage.setItem(KEY_DATA, JSON.stringify(memos, null, 2));
+  alert(`保存しました（${memos.length}件）`);
 };
-
