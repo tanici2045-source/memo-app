@@ -7,7 +7,8 @@ App.actions.exportCSV = () => {
   const { escapeCsv, downloadBlob } = App.storage;
   const memos = App.state.memos || [];
 
-  const header = ["id","title","body","status","created","updated"];
+  const header = ["id","body","feeling","created","updated"];
+
   const lines = [header.join(",")];
 
   for (const m of memos) {
