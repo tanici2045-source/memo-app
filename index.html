@@ -18,27 +18,25 @@
 <br><br>
 <button id="saveBtn">保存</button>
 
-<script>
-  // 最小の DOM 定義だけ
-  window.App = window.App || {};
-  App.dom = {
-    bodyInput: document.getElementById("bodyInput")
-  };
+<!-- ① 先に外部JSを読む（App.actions を先に用意する） -->
+<script src="js/app.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/actions.js"></script>
 
+<!-- ② 最後に “配線だけ” を書く -->
+<script>
+  window.App = window.App || {};
+  App.dom = App.dom || {};
   App.state = App.state || {};
   App.state.memos = App.state.memos || [];
 
-  document.getElementById("saveBtn")
-    .addEventListener("click", App.actions.doSave);
+  // DOM参照
+  App.dom.bodyInput = document.getElementById("bodyInput");
+  App.dom.saveBtn   = document.getElementById("saveBtn");
+
+  // クリック配線（ここで App.actions.doSave が存在する）
+  App.dom.saveBtn.addEventListener("click", App.actions.doSave);
 </script>
-  <script src="js/app.js"></script>
-  <script src="js/storage.js"></script>
-  <script src="js/actions.js"></script>
-  <script src="js/render.js"></script>
+
 </body>
 </html>
-
-
-
-
-
