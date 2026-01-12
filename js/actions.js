@@ -43,7 +43,9 @@ App.actions.doSave = () => {
   alert(`保存しました（${memos.length}件）`);
 
   // 保存できたら入力欄クリア
-document.getElementById("bodyInput").value = "";
-document.getElementById("feelingInput").value = "";
+  // 保存できたら入力欄クリア
+  bodyEl.value = "";
+  if (feelingEl) feelingEl.value = "";
+
 };
 
