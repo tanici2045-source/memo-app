@@ -42,5 +42,7 @@ App.actions.doSave = () => {
   console.log("SAVED KEY_DATA:", KEY_DATA, "len:", memos.length); // ←この1行
   alert(`保存しました（${memos.length}件）`);
   // ★ ここに1行追加
-bodyEl.value = "";
+  bodyEl.value = "";
+  const feelingEl = document.getElementById("feelingInput");
+  if (feelingEl) feelingEl.value = "";
 };
