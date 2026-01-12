@@ -7,7 +7,7 @@ App.actions.doSave = () => {
   // DOM を自分で取りに行く（App.dom が無くても動く）
   const bodyEl = document.getElementById("bodyInput");
   const feelingEl = document.getElementById("feelingInput");
-}
+
   if (!bodyEl) {
     alert("bodyInput が見つかりません");
     return;
@@ -45,5 +45,5 @@ App.actions.doSave = () => {
   // 保存できたら入力欄クリア
 document.getElementById("bodyInput").value = "";
 document.getElementById("feelingInput").value = "";
-
+};
 
