@@ -18,7 +18,7 @@ App.actions.doSave = () => {
     alert("空です。何か書いてから保存してください。");
     return;
   }
-}
+
   // localStorage に保存（最小）
   const KEY_DATA = "mymemo:data:v1";
   let memos = [];
@@ -41,7 +41,7 @@ App.actions.doSave = () => {
   localStorage.setItem(KEY_DATA, JSON.stringify(memos, null, 2));
   console.log("SAVED KEY_DATA:", KEY_DATA, "len:", memos.length); // ←この1行
   alert(`保存しました（${memos.length}件）`);
-  
+} 
   // 保存できたら入力欄クリア
 document.getElementById("bodyInput").value = "";
 document.getElementById("feelingInput").value = "";
