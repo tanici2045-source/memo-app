@@ -18,7 +18,7 @@ App.actions.doSave = () => {
     alert("空です。何か書いてから保存してください。");
     return;
   }
-
+}
   // localStorage に保存（最小）
   const KEY_DATA = "mymemo:data:v1";
   let memos = [];
