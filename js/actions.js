@@ -43,5 +43,5 @@ App.actions.doSave = () => {
   alert(`保存しました（${memos.length}件）`);
   // ★ ここに1行追加
   bodyEl.value = "";
-  document.getElementById("feelingInput");
+  
 
