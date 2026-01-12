@@ -44,5 +44,4 @@ App.actions.doSave = () => {
   // ★ ここに1行追加
   bodyEl.value = "";
   const feelingEl = document.getElementById("feelingInput");
-  if (feelingEl) feelingEl.value = "";
-};
+
