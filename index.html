@@ -34,35 +34,30 @@
 <!-- ② 最後に “配線だけ” を書く -->
 <script>
   window.App = window.App || {};
+
+  // DOM参照をまとめて定義
   App.dom = {
     bodyInput: document.getElementById("bodyInput"),
     feelingInput: document.getElementById("feelingInput"),
     saveBtn: document.getElementById("saveBtn"),
-    exportCsvBtn: document.getElementById("exportCsvBtn"), 
-    // 保存
+    exportCsvBtn: document.getElementById("exportCsvBtn"),
+    clearExportedBtn: document.getElementById("clearExportedBtn"),
+  };
+
+  // 保存
   App.dom.saveBtn.addEventListener("click", App.actions.doSave);
-.state = App.state || {};
-  App.state.memos = App.state.memos || [];
 
+  // CSV書き出し
+  App.dom.exportCsvBtn.addEventListener("click", () => {
+    App.actions.exportCSV();
+  });
 
-  
-   // ★ここ// CSV書き出し
-  App.dom.exportCsvBtn.addEventListener("click", () => App.actions.exportCSV());
-
-   // 書き出し済み削除（←追加）
-  App.dom.clearExportedBtn.addEventListener("click", () => App.actions.clearExported())
-
-  //ＣＳＶ書き出し
-  document.getElementById("exportCsvBtn")
-  .addEventListener("click", () => App.actions.exportCSV());
-
-  // DOM参照
-  App.dom.bodyInput = document.getElementById("bodyInput");
-  App.dom.saveBtn   = document.getElementById("saveBtn");
-
-  // クリック配線（ここで App.actions.doSave が存在する）
-  App.dom.saveBtn.addEventListener("click", App.actions.doSave);
+  // 書き出し済み削除
+  App.dom.clearExportedBtn.addEventListener("click", () => {
+    App.actions.clearExported();
+  });
 </script>
+
 
 </body>
 </html>
