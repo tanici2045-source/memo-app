@@ -19,6 +19,8 @@
 <br><br>
 
  <button id="saveBtn" type="button">保存</button>
+ <button id="clearExportedBtn" type="button">書き出し済み削除</button>
+ 
  
 <button id="exportCsvBtn">CSV書き出し</button>
   
@@ -34,12 +36,22 @@
   window.App = window.App || {};
   App.dom = {
     bodyInput: document.getElementById("bodyInput"),
+    feelingInput: document.getElementById("feelingInput"),
     saveBtn: document.getElementById("saveBtn"),
-  };
-  App.state = App.state || {};
+    exportCsvBtn: document.getElementById("exportCsvBtn"), 
+    // 保存
+  App.dom.saveBtn.addEventListener("click", App.actions.doSave);
+.state = App.state || {};
   App.state.memos = App.state.memos || [];
-   // ★ここで登録（actions.js 読み込み後なので確実）
- 
+
+
+  
+   // ★ここ// CSV書き出し
+  App.dom.exportCsvBtn.addEventListener("click", () => App.actions.exportCSV());
+
+   // 書き出し済み削除（←追加）
+  App.dom.clearExportedBtn.addEventListener("click", () => App.actions.clearExported())
+
   //ＣＳＶ書き出し
   document.getElementById("exportCsvBtn")
   .addEventListener("click", () => App.actions.exportCSV());
